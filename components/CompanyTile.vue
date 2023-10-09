@@ -1,12 +1,10 @@
 <template>
-  <router-link :to="link" :is="noLink ? 'span' : 'router-link'" class="hover">
+  <!--eslint-disable-next-line-->
+  <a :is="noLink ? 'span' : 'a'" @click="openLink" class="hover">
     <div class="sizing" :class="{ 'no-margin': noMargin }">
       <div class="card">
         <div class="image">
-          <div
-            v-if="this.picture == null && data.image == undefined"
-            class="no-image"
-          >
+          <div v-if="this.picture == null && data.image == undefined" class="no-image">
             <i class="fa-solid fa-image fa-2xl"></i>
           </div>
           <img v-else-if="data.image != undefined" :src="data.image" alt="" />
@@ -17,12 +15,8 @@
             {{ data.name }}
           </h2>
           <div class="col-3">
-            <CompanyBadge
-              :verified="data.verified"
-              :premium="data.abo == 'Business'"
-              :self="data.alias == 'schillerando'"
-              class="company-badge"
-            />
+            <CompanyBadge :verified="data.verified" :premium="data.abo == 'Business'" :self="data.alias == 'schillerando'"
+              class="company-badge" />
           </div>
         </div>
         <div class="category highlight">
@@ -36,16 +30,17 @@
         </div>
       </div>
     </div>
-  </router-link>
+  </a>
 </template>
-
+  
 <script>
 import { supabase } from '@/supabase';
+import router from '@/router'
 import CompanyBadge from '@/shared/components/CompanyBadge.vue';
 
 export default {
   name: 'CompanyTile',
-  props: ['data', 'noMargin', 'noLink'],
+  props: ['data', 'noMargin', 'noLink', 'linkViaEvent'],
   data() {
     return {
       picture: null,
@@ -70,14 +65,21 @@ export default {
       return `/${this.data.alias}`;
     },
   },
-  watch: {
-    data() {
-      if (this.data.header_picture) this.picture = null;
-    },
-  },
+  methods: {
+    openLink() {
+      console.log('Company tile: link via event?', this.$props.linkViaEvent)
+      if (this.$props.linkViaEvent) {
+        history.pushState({}, null, process.env.VUE_APP_MAIN_URL + '/' + this.data.alias)
+        const event = new CustomEvent('openDetailView', { detail: this.data.alias });
+        document.dispatchEvent(event);
+      } else {
+        router.push(this.data.link);
+      }
+    }
+  }
 };
 </script>
-
+  
 <style scoped>
 .row {
   padding: 10px 0 0 10px;
@@ -171,3 +173,4 @@ img {
   color: black;
 }
 </style>
+  
