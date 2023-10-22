@@ -73,7 +73,7 @@ export default {
         const event = new CustomEvent('openDetailView', { detail: this.data.alias });
         document.dispatchEvent(event);
       } else {
-        router.push(this.data.link);
+        router.push(this.data.alias);
       }
     }
   }
